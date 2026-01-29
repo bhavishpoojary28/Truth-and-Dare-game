@@ -1,0 +1,773 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Truth & Dare with Friends</title>
+    <style>
+        @import url('https://fonts.googleapis.com/css2?family=Fredoka+One:wght@400&family=Poppins:wght@300;400;600;700&display=swap');
+        
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+        
+        body {
+            font-family: 'Poppins', sans-serif;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            min-height: 100vh;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: white;
+        }
+        
+        .container {
+            width: 90%;
+            max-width: 500px;
+            text-align: center;
+            padding: 20px;
+        }
+        
+        .screen {
+            display: none;
+            background: rgba(255, 255, 255, 0.1);
+            backdrop-filter: blur(10px);
+            border-radius: 20px;
+            padding: 40px 30px;
+            box-shadow: 0 8px 32px rgba(31, 38, 135, 0.37);
+            border: 1px solid rgba(255, 255, 255, 0.18);
+        }
+        
+        .screen.active {
+            display: block;
+            animation: slideIn 0.5s ease-out;
+        }
+        
+        @keyframes slideIn {
+            from {
+                opacity: 0;
+                transform: translateY(20px);
+            }
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+        
+        .app-logo {
+            text-align: center;
+            margin-bottom: 30px;
+        }
+        
+        .logo-icon {
+            margin-bottom: 10px;
+            animation: bounce 2s ease-in-out infinite;
+        }
+        
+        .logo-image {
+            width: 120px;
+            height: auto;
+            max-width: 150px;
+            filter: drop-shadow(0 0 10px rgba(255, 255, 255, 0.3));
+            transition: transform 0.3s ease;
+        }
+        
+        .logo-image:hover {
+            transform: scale(1.05);
+        }
+        
+        .logo-text {
+            font-family: 'Fredoka One', cursive;
+            font-size: 2.5rem;
+            margin-bottom: 5px;
+            text-shadow: 2px 2px 4px rgba(0, 0, 0, 0.3);
+            background: linear-gradient(45deg, #ff6b6b, #4ecdc4, #ffe66d);
+            background-size: 200% 200%;
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            animation: gradientMove 3s ease infinite;
+        }
+        
+        .logo-subtitle {
+            font-family: 'Poppins', sans-serif;
+            font-size: 1.2rem;
+            color: #f0f0f0;
+            font-weight: 300;
+            opacity: 0.9;
+        }
+        
+        @keyframes bounce {
+            0%, 20%, 50%, 80%, 100% {
+                transform: translateY(0);
+            }
+            40% {
+                transform: translateY(-10px);
+            }
+            60% {
+                transform: translateY(-5px);
+            }
+        }
+        
+        h1 {
+            font-family: 'Fredoka One', cursive;
+            font-size: 2.5rem;
+            margin-bottom: 20px;
+            text-shadow: 2px 2px 4px rgba(0, 0, 0, 0.3);
+            background: linear-gradient(45deg, #ff6b6b, #4ecdc4, #ffe66d);
+            background-size: 200% 200%;
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            animation: gradientMove 3s ease infinite;
+        }
+        
+        @keyframes gradientMove {
+            0% { background-position: 0% 50%; }
+            50% { background-position: 100% 50%; }
+            100% { background-position: 0% 50%; }
+        }
+        
+        h2 {
+            font-size: 1.8rem;
+            margin-bottom: 15px;
+            color: #fff;
+        }
+        
+        h3 {
+            font-size: 1.3rem;
+            margin-bottom: 20px;
+            color: #f0f0f0;
+        }
+        
+        .btn {
+            background: linear-gradient(45deg, #ff6b6b, #4ecdc4);
+            border: none;
+            padding: 15px 30px;
+            margin: 10px;
+            border-radius: 50px;
+            color: white;
+            font-size: 1.1rem;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            box-shadow: 0 4px 15px rgba(0, 0, 0, 0.2);
+            text-decoration: none;
+            display: inline-block;
+            min-width: 150px;
+        }
+        
+        .btn:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 6px 20px rgba(0, 0, 0, 0.3);
+        }
+        
+        .btn:active {
+            transform: translateY(0);
+        }
+        
+        .btn-truth {
+            background: linear-gradient(45deg, #4ecdc4, #44a08d);
+        }
+        
+        .btn-dare {
+            background: linear-gradient(45deg, #ff6b6b, #ee5a24);
+        }
+        
+        .btn-small {
+            padding: 10px 20px;
+            font-size: 0.9rem;
+            min-width: 100px;
+        }
+        
+        .question-card {
+            background: rgba(255, 255, 255, 0.2);
+            border-radius: 15px;
+            padding: 30px;
+            margin: 20px 0;
+            backdrop-filter: blur(5px);
+            border: 1px solid rgba(255, 255, 255, 0.3);
+        }
+        
+        .question-text {
+            font-size: 1.2rem;
+            line-height: 1.5;
+            margin-bottom: 20px;
+        }
+        
+        .player-input {
+            width: 100%;
+            padding: 15px;
+            margin: 10px 0;
+            border: none;
+            border-radius: 10px;
+            font-size: 1rem;
+            background: rgba(255, 255, 255, 0.9);
+            color: #333;
+        }
+        
+        .player-input::placeholder {
+            color: #666;
+        }
+        
+        .player-list {
+            margin: 20px 0;
+        }
+        
+        .player-item {
+            background: rgba(255, 255, 255, 0.2);
+            padding: 10px 15px;
+            margin: 5px 0;
+            border-radius: 10px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+        
+        .current-player {
+            font-size: 1.3rem;
+            font-weight: 700;
+            color: #ffe66d;
+            margin-bottom: 15px;
+        }
+        
+        .remove-btn {
+            background: #ff4757;
+            color: white;
+            border: none;
+            padding: 5px 10px;
+            border-radius: 5px;
+            cursor: pointer;
+            font-size: 0.8rem;
+        }
+        
+        .game-stats {
+            display: flex;
+            justify-content: space-around;
+            margin: 20px 0;
+            font-size: 0.9rem;
+        }
+        
+        .stat {
+            background: rgba(255, 255, 255, 0.2);
+            padding: 10px;
+            border-radius: 10px;
+            flex: 1;
+            margin: 0 5px;
+        }
+        
+        @media (max-width: 480px) {
+            .container {
+                width: 95%;
+                padding: 10px;
+            }
+            
+            .screen {
+                padding: 30px 20px;
+            }
+            
+            h1 {
+                font-size: 2rem;
+            }
+            
+            .btn {
+                padding: 12px 25px;
+                font-size: 1rem;
+                margin: 8px;
+                min-width: 130px;
+            }
+            
+            .question-text {
+                font-size: 1.1rem;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <!-- Welcome Screen -->
+        <div id="welcome-screen" class="screen active">
+            <div class="app-logo">
+                <div class="logo-icon">
+                    <img src="logoo.png" alt="BP Poojary Logo" class="logo-image">
+                </div>
+                <div class="logo-text">Truth & Dare</div>
+                <div class="logo-subtitle">with Friends</div>
+            </div>
+            <p style="font-size: 1.1rem; margin-bottom: 30px; opacity: 0.9;">
+                Get ready for fun, laughter, and unforgettable moments!
+            </p>
+            <button class="btn" onclick="showGameMode()">🚀 Start Game</button>
+            <div style="margin-top: 20px; font-size: 0.9rem; opacity: 0.7; color: #f0f0f0;">
+                Created by <strong>Bhavish Poojary</strong>
+            </div>
+        </div>
+        
+        <!-- Game Mode Selection -->
+        <div id="game-mode-screen" class="screen">
+            <h2>Choose Game Mode</h2>
+            <button class="btn" onclick="startSoloMode()">🎯 Solo Mode</button>
+            <button class="btn" onclick="showPlayerSetup()">👥 Friends Mode</button>
+            <button class="btn btn-small" onclick="showWelcome()">← Back</button>
+        </div>
+        
+        <!-- Player Setup Screen -->
+        <div id="player-setup-screen" class="screen">
+            <h2>Add Players</h2>
+            <input type="text" id="player-name-input" class="player-input" placeholder="Enter player name" maxlength="20">
+            <button class="btn btn-small" onclick="addPlayer()">➕ Add Player</button>
+            
+            <div class="player-list" id="player-list">
+                <!-- Players will be added here -->
+            </div>
+            
+            <div style="margin-top: 30px;">
+                <button class="btn" onclick="startFriendsMode()" id="start-friends-btn" disabled>🎮 Start Game</button>
+                <button class="btn btn-small" onclick="showGameMode()">← Back</button>
+            </div>
+        </div>
+        
+        <!-- Solo Game Screen -->
+        <div id="solo-game-screen" class="screen">
+            <h2>Choose Your Challenge</h2>
+            <button class="btn btn-truth" onclick="generateTruth(false)">💭 Truth</button>
+            <button class="btn btn-dare" onclick="generateDare(false)">⚡ Dare</button>
+            <button class="btn btn-small" onclick="showGameMode()">🏠 Home</button>
+            
+            <div class="game-stats">
+                <div class="stat">
+                    <div>Truths: <span id="solo-truth-count">0</span></div>
+                </div>
+                <div class="stat">
+                    <div>Dares: <span id="solo-dare-count">0</span></div>
+                </div>
+            </div>
+        </div>
+        
+        <!-- Friends Game Screen -->
+        <div id="friends-game-screen" class="screen">
+            <div class="current-player" id="current-player-display">
+                <!-- Current player will be displayed here -->
+            </div>
+            
+            <h3>Choose Your Challenge</h3>
+            <button class="btn btn-truth" onclick="generateTruth(true)">💭 Truth</button>
+            <button class="btn btn-dare" onclick="generateDare(true)">⚡ Dare</button>
+            <button class="btn btn-small" onclick="showGameMode()">🏠 Home</button>
+            
+            <div class="game-stats">
+                <div class="stat">
+                    <div>Round: <span id="round-count">1</span></div>
+                </div>
+                <div class="stat">
+                    <div>Players: <span id="player-count">0</span></div>
+                </div>
+            </div>
+        </div>
+        
+        <!-- Question Display Screen -->
+        <div id="question-screen" class="screen">
+            <div id="question-header">
+                <!-- Question type and player info will be shown here -->
+            </div>
+            
+            <div class="question-card">
+                <div class="question-text" id="question-text">
+                    <!-- Question/dare will appear here -->
+                </div>
+            </div>
+            
+            <button class="btn" onclick="nextQuestion()">🔄 Next</button>
+            <button class="btn btn-small" onclick="goBack()">← Back</button>
+        </div>
+    </div>
+
+    <script>
+        // Game state
+        let gameState = {
+            mode: 'solo', // 'solo' or 'friends'
+            players: [],
+            currentPlayerIndex: 0,
+            round: 1,
+            soloStats: { truths: 0, dares: 0 },
+            previousScreen: 'welcome-screen'
+        };
+        
+        // Truth questions - safe, fun, and engaging
+        const truthQuestions = [
+            "What's the most embarrassing thing that's ever happened to you?",
+            "Who was your first crush and do you still think about them?",
+            "What's the weirdest dream you've ever had?",
+            "If you could only eat one food for the rest of your life, what would it be?",
+            "What's your biggest fear that others might find silly?",
+            "Have you ever had an imaginary friend? What was their name?",
+            "What's the most trouble you've ever gotten into?",
+            "If you could switch lives with anyone for a day, who would it be?",
+            "What's your most irrational fear?",
+            "Have you ever talked to yourself in the mirror?",
+            "What's the worst haircut you've ever had?",
+            "If you could have dinner with any fictional character, who would it be?",
+            "What's something you've never told your parents?",
+            "Have you ever pretended to be sick to get out of something?",
+            "What's the strangest thing you believed as a child?",
+            "If you were invisible for a day, what would you do?",
+            "What's your most embarrassing autocorrect fail?",
+            "Have you ever had a crush on a cartoon character?",
+            "What's the worst advice you've ever given someone?",
+            "If you could relive one day from your past, which would it be?",
+            "What's something you do when you're alone that you wouldn't want others to know?",
+            "Have you ever laughed so hard you cried? What was so funny?",
+            "What's the most childish thing you still do?",
+            "If you had to wear one outfit for the rest of your life, what would it be?",
+            "What's your guilty pleasure song that you're embarrassed to admit you love?",
+            "Have you ever practiced conversations in your head before having them?",
+            "What's the weirdest compliment you've ever received?",
+            "If you could master any skill instantly, what would it be?",
+            "What's something you've always wanted to try but been too scared to?",
+            "Have you ever fallen asleep in an embarrassing place?",
+            // Spicier truth questions added below
+            "What's the most embarrassing thing you've ever done to impress someone?",
+            "Have you ever had a crush on someone in this room?",
+            "What's the worst lie you've ever told?",
+            "Have you ever snooped through someone's phone or social media?",
+            "What's something you've never told your best friend?",
+            "Have you ever had a secret relationship?",
+            "What's the most embarrassing thing you've ever googled?",
+            "Have you ever pretended to be someone else online?",
+            "What's something you've done that you hope your parents never find out?",
+            "Have you ever had a crush on a teacher or authority figure?",
+            "What's the most embarrassing thing you've ever posted on social media?",
+            "Have you ever lied about your age or identity?",
+            "What's something you've stolen (even something small)?",
+            "Have you ever had a dream about someone in this room?",
+            "What's the most embarrassing thing you've ever said to someone you liked?",
+            "Have you ever pretended to be sick to avoid someone?",
+            "What's something you've done that you're still ashamed of?",
+            "Have you ever had a crush on someone's sibling or family member?",
+            "What's the most embarrassing thing you've ever done at a party?",
+            "Have you ever lied about your relationship status?",
+            "What's something you've done that you hope your ex never finds out?",
+            "Have you ever had a crush on someone much older or younger than you?",
+            "What's the most embarrassing thing you've ever done to get someone's attention?",
+            "Have you ever pretended to like something you actually hate?",
+            "What's something you've done that you hope your future partner never finds out?",
+            "Have you ever had a crush on someone who was already taken?",
+            "What's the most embarrassing thing you've ever done when you were drunk?",
+            "Have you ever lied about your experience with something?",
+            "What's something you've done that you hope your boss never finds out?",
+            "Have you ever had a crush on someone you met online?",
+            "What's the most embarrassing thing you've ever done in public?",
+            "Have you ever pretended to be more experienced than you actually are?",
+            "What's something you've done that you hope your siblings never find out?",
+            "Have you ever had a crush on someone you shouldn't have?",
+            "What's the most embarrassing thing you've ever done to fit in?",
+            "Have you ever lied about your past to make yourself look better?",
+            "What's something you've done that you hope your neighbors never find out?",
+            "Have you ever had a crush on someone you barely know?",
+            "What's the most embarrassing thing you've ever done to avoid someone?",
+            "Have you ever pretended to be someone you're not?",
+            "What's something you've done that you hope your future children never find out?",
+            "Have you ever had a crush on someone you met at work or school?",
+            "What's the most embarrassing thing you've ever done to impress your crush?",
+            "Have you ever lied about your feelings to protect someone?",
+            "What's something you've done that you hope your future in-laws never find out?"
+        ];
+        
+        // Dare tasks - fun, creative, and a bit spicy!
+        const dareTasks = [
+            "Do your best impression of a famous celebrity for 30 seconds",
+            "Tell a joke in the worst accent you can imagine",
+            "Act out your morning routine in slow motion",
+            "Pretend to be a weather reporter describing today's weather dramatically",
+            "Do 10 jumping jacks while saying the alphabet backwards",
+            "Speak in rhymes for the next 3 sentences you say",
+            "Pretend you're a tour guide showing people around your current location",
+            "Act like your favorite animal for 1 minute",
+            "Tell everyone your life story in exactly 30 seconds",
+            "Pretend to be a cooking show host and describe how to make a sandwich",
+            "Walk across the room like you're on a tightrope",
+            "Act out a scene from your favorite movie without speaking",
+            "Do your best superhero pose and hold it for 10 seconds",
+            "Pretend to be a news anchor reporting on a silly made-up story",
+            "Act like you're trapped in a box for 1 minute",
+            "Pretend to be a teacher giving a lesson on something ridiculous",
+            "Act out your favorite emoji using only facial expressions",
+            "Do a dramatic reading of the last text message you sent",
+            "Pretend you're a mime for the next 2 minutes",
+            "Do your best impression of someone in the room (if playing with friends)",
+            "Act like you're underwater for 30 seconds",
+            "Pretend to be a sports commentator describing someone walking across the room",
+            "Do a silly dance every time someone says a specific word for the next 5 minutes",
+            // Spicier dares added below
+            "Call your ex and ask them what their favorite color is (if you're comfortable)",
+            "Send a flirty text to the last person in your contacts",
+            "Give everyone in the room a compliment using your most dramatic voice",
+            "Act out your most embarrassing moment from high school",
+            "Pretend to be a dating app profile and describe yourself dramatically",
+            "Act out your ideal first date scenario",
+            "Do your best 'come hither' look and hold it for 10 seconds",
+            "Pretend to be a romance novel character and recite a cheesy pickup line",
+            "Act out your worst dating disaster story",
+            "Do a dramatic reading of a romantic poem",
+            "Pretend to be a love guru giving dating advice",
+            "Act out your dream proposal scenario",
+            "Do your best impression of a soap opera actor",
+            "Pretend to be a dating coach and give everyone advice",
+            "Act out your most romantic movie scene",
+            "Do a dramatic reading of your last Google search",
+            "Pretend to be a reality TV show contestant introducing yourself",
+            "Act out your worst nightmare date",
+            "Do your best impression of someone having a crush",
+            "Act out your ideal romantic dinner scene",
+            "Pretend to be a love letter and recite yourself dramatically",
+            "Do your best impression of someone falling in love",
+            "Act out your most awkward social media moment",
+            "Pretend to be a dating app and describe your perfect match",
+            "Do a dramatic reading of your browser history (keep it PG!)",
+            "Act out your most embarrassing social media post",
+            // Additional spicy dares
+            "Call your mom and tell her you love her in the most dramatic way possible",
+            "Pretend to be a fortune teller and predict everyone's future",
+            "Act out your worst nightmare",
+            "Do your best impression of a politician giving a speech",
+            "Pretend to be a news reporter covering breaking news about your life",
+            "Act out your morning routine as if you're in a silent movie",
+            "Pretend to be a game show host and interview everyone",
+            "Do your best impression of someone from a different decade",
+            "Act out your ideal vacation scenario",
+            "Pretend to be a detective investigating a mystery",
+            "Do your best impression of a superhero origin story",
+            "Act out your worst job interview experience",
+            "Pretend to be a motivational speaker giving a pep talk",
+            "Do your best impression of someone having a midlife crisis",
+            "Act out your most awkward family gathering moment",
+            "Pretend to be a weather person reporting on your emotions",
+            "Do your best impression of someone discovering they won the lottery",
+            "Act out your ideal retirement plan",
+            "Pretend to be a time traveler explaining the future",
+            "Do your best impression of someone trying to parallel park",
+            "Act out your worst online shopping experience",
+            "Pretend to be a conspiracy theorist explaining something mundane",
+            "Do your best impression of someone trying to assemble IKEA furniture",
+            "Act out your most embarrassing autocorrect moment",
+            "Pretend to be a life coach giving terrible advice",
+            "Do your best impression of someone trying to use a new app",
+            "Act out your worst customer service experience",
+            "Pretend to be a scientist explaining something you know nothing about",
+            "Do your best impression of someone trying to take a selfie",
+            "Act out your most awkward elevator moment",
+            "Pretend to be a travel blogger reviewing your current location",
+            "Do your best impression of someone trying to parallel park",
+            "Act out your worst first impression story",
+            "Pretend to be a food critic reviewing your last meal",
+            "Do your best impression of someone trying to use voice commands",
+            "Act out your most embarrassing autocorrect fail",
+            "Pretend to be a conspiracy theorist explaining something mundane",
+            "Do your best impression of someone trying to assemble IKEA furniture",
+            "Act out your worst online shopping experience",
+            "Pretend to be a life coach giving terrible advice",
+            "Do your best impression of someone trying to use a new app",
+            "Act out your worst customer service experience",
+            "Pretend to be a scientist explaining something you know nothing about",
+            "Do your best impression of someone trying to take a selfie",
+            "Act out your most awkward elevator moment",
+            "Pretend to be a travel blogger reviewing your current location"
+        ];
+        
+        // Screen management functions
+        function showScreen(screenId) {
+            // Hide all screens
+            const screens = document.querySelectorAll('.screen');
+            screens.forEach(screen => screen.classList.remove('active'));
+            
+            // Show target screen
+            document.getElementById(screenId).classList.add('active');
+        }
+        
+        function showWelcome() {
+            gameState.previousScreen = 'welcome-screen';
+            showScreen('welcome-screen');
+        }
+        
+        function showGameMode() {
+            gameState.previousScreen = 'game-mode-screen';
+            showScreen('game-mode-screen');
+        }
+        
+        function showPlayerSetup() {
+            gameState.previousScreen = 'player-setup-screen';
+            showScreen('player-setup-screen');
+            document.getElementById('player-name-input').focus();
+        }
+        
+        // Game mode functions
+        function startSoloMode() {
+            gameState.mode = 'solo';
+            gameState.soloStats = { truths: 0, dares: 0 };
+            gameState.previousScreen = 'solo-game-screen';
+            updateSoloStats();
+            showScreen('solo-game-screen');
+        }
+        
+        function startFriendsMode() {
+            if (gameState.players.length < 2) {
+                alert('Please add at least 2 players!');
+                return;
+            }
+            
+            gameState.mode = 'friends';
+            gameState.currentPlayerIndex = 0;
+            gameState.round = 1;
+            gameState.previousScreen = 'friends-game-screen';
+            updateFriendsDisplay();
+            showScreen('friends-game-screen');
+        }
+        
+        // Player management functions
+        function addPlayer() {
+            const input = document.getElementById('player-name-input');
+            const playerName = input.value.trim();
+            
+            if (playerName === '') {
+                alert('Please enter a player name!');
+                return;
+            }
+            
+            if (gameState.players.includes(playerName)) {
+                alert('This player name already exists!');
+                return;
+            }
+            
+            if (gameState.players.length >= 10) {
+                alert('Maximum 10 players allowed!');
+                return;
+            }
+            
+            gameState.players.push(playerName);
+            input.value = '';
+            updatePlayerList();
+            input.focus();
+        }
+        
+        function removePlayer(index) {
+            gameState.players.splice(index, 1);
+            updatePlayerList();
+        }
+        
+        function updatePlayerList() {
+            const playerList = document.getElementById('player-list');
+            const startBtn = document.getElementById('start-friends-btn');
+            
+            playerList.innerHTML = '';
+            
+            gameState.players.forEach((player, index) => {
+                const playerItem = document.createElement('div');
+                playerItem.className = 'player-item';
+                playerItem.innerHTML = `
+                    <span>${player}</span>
+                    <button class="remove-btn" onclick="removePlayer(${index})">✖</button>
+                `;
+                playerList.appendChild(playerItem);
+            });
+            
+            // Enable/disable start button
+            startBtn.disabled = gameState.players.length < 2;
+            startBtn.style.opacity = gameState.players.length < 2 ? '0.5' : '1';
+        }
+        
+        // Question generation functions
+        function generateTruth(isFriendsMode) {
+            const randomTruth = truthQuestions[Math.floor(Math.random() * truthQuestions.length)];
+            displayQuestion('Truth', randomTruth, isFriendsMode);
+            
+            if (isFriendsMode) {
+                // Move to next player
+                nextPlayer();
+            } else {
+                gameState.soloStats.truths++;
+                updateSoloStats();
+            }
+        }
+        
+        function generateDare(isFriendsMode) {
+            const randomDare = dareTasks[Math.floor(Math.random() * dareTasks.length)];
+            displayQuestion('Dare', randomDare, isFriendsMode);
+            
+            if (isFriendsMode) {
+                // Move to next player
+                nextPlayer();
+            } else {
+                gameState.soloStats.dares++;
+                updateSoloStats();
+            }
+        }
+        
+        function displayQuestion(type, question, isFriendsMode) {
+            const header = document.getElementById('question-header');
+            const questionText = document.getElementById('question-text');
+            
+            if (isFriendsMode) {
+                const currentPlayer = gameState.players[gameState.currentPlayerIndex];
+                header.innerHTML = `<h2>${type} for ${currentPlayer}</h2>`;
+            } else {
+                header.innerHTML = `<h2>${type}</h2>`;
+            }
+            
+            questionText.textContent = question;
+            showScreen('question-screen');
+        }
+        
+        // Game flow functions
+        function nextPlayer() {
+            gameState.currentPlayerIndex = (gameState.currentPlayerIndex + 1) % gameState.players.length;
+            if (gameState.currentPlayerIndex === 0) {
+                gameState.round++;
+            }
+            updateFriendsDisplay();
+        }
+        
+        function nextQuestion() {
+            if (gameState.mode === 'friends') {
+                showScreen('friends-game-screen');
+            } else {
+                showScreen('solo-game-screen');
+            }
+        }
+        
+        function goBack() {
+            showScreen(gameState.previousScreen);
+        }
+        
+        // UI update functions
+        function updateSoloStats() {
+            document.getElementById('solo-truth-count').textContent = gameState.soloStats.truths;
+            document.getElementById('solo-dare-count').textContent = gameState.soloStats.dares;
+        }
+        
+        function updateFriendsDisplay() {
+            const currentPlayerDisplay = document.getElementById('current-player-display');
+            const roundCount = document.getElementById('round-count');
+            const playerCount = document.getElementById('player-count');
+            
+            if (gameState.players.length > 0) {
+                const currentPlayer = gameState.players[gameState.currentPlayerIndex];
+                currentPlayerDisplay.textContent = `${currentPlayer}'s Turn! 🎯`;
+                roundCount.textContent = gameState.round;
+                playerCount.textContent = gameState.players.length;
+            }
+        }
+        
+        // Event listeners
+        document.getElementById('player-name-input').addEventListener('keypress', function(e) {
+            if (e.key === 'Enter') {
+                addPlayer();
+            }
+        });
+        
+        // Initialize app
+        document.addEventListener('DOMContentLoaded', function() {
+            console.log('Truth & Dare with Friends - App Loaded! 🎭');
+        });
+    </script>
+</body>
+</html>
